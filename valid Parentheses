@@ -1,0 +1,23 @@
+public class Solution {
+    public boolean isValid(String s) {
+        Stack<Character> stack =new Stack<>();
+        for (int i=0; i<s.length();i++){
+             if (s.charAt(i) == '(' || s.charAt(i) == '{' || s.charAt(i) == '[' ){
+                 stack.push(s.charAt(i));// 如果符合（{[ 就放到stack里
+             }
+             else { 
+                 if (stack.size()==0){return false;} 如果不符合而且stack又是空那就说明不对称 错
+                 else {
+                     char c = stack.pop(); 如果不符合但是stack不为空， 那和存在stack的上一个比较（用pop弹出）比较，如果新的和上一个弹出的对称 就ok
+                     if (s.charAt(i) == ')' && c != '(') return false;
+                     if (s.charAt(i) == '}' && c != '{') return false;
+                     if (s.charAt(i) == ']' && c != '[') return false;
+                 }
+        }
+    }
+    if (stack.size()!=0){ 如果最后不为空 就错（因为如果对称的话，应该压一个弹一个）
+        return false;
+    }return true;如果都符合 就对 返回
+}
+}
+// use stack to store the 
