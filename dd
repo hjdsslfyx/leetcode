@@ -1,0 +1,184 @@
+// Name:
+// USC loginid:
+// CS 455 PA2
+// Spring 2017
+
+
+import java.util.*;
+
+
+
+/**
+   A polynomial. Polynomials can be added together, evaluated, and
+   converted to a string form for printing.
+*/
+public class Polynomial {
+	private ArrayList<Term> res; 
+	private int size;
+
+
+    /**
+       Creates the 0 polynomial
+    */
+    public Polynomial() {
+    	
+        assert isValidPolynomial();
+        res=new ArrayList<Term>();
+        size=res.size();
+    }
+
+
+    /**
+       Creates polynomial with single term given
+     */
+    public Polynomial(Term term) {
+    	assert isValidPolynomial();
+    	res=new ArrayList<Term>();
+    	res.add(term);
+    	size++;
+    	
+    }
+
+
+    /**
+       Returns the Polynomial that is the sum of this polynomial and b
+       (neither poly is modified)
+     */
+    public Polynomial add(Polynomial b) {
+        Polynomial sum=new Polynomial();
+    	int i=0,j=0;
+    	while(i<res.size() && j<b.res.size()){  //combining two polynomials based on their exponential component
+    		int this_exp=res.get(i).getExpon();
+    		int b_exp=b.res.get(j).getExpon();
+    		if(this_exp>b_exp){
+    			sum.res.add(res.get(i));
+    			i++;
+    		}else if(this_exp==b_exp){
+    			double this_cof=res.get(i).getCoeff();
+    			double b_cof=b.res.get(j).getCoeff();
+    			double sumcof=this_cof+b_cof;
+    			sum.res.add(new Term(sumcof,this_exp));
+    			i++;
+    			j++;
+    		}else{
+    				sum.res.add(b.res.get(j));
+    				j++;
+    			}
+    		}
+    	while(i!=res.size()){
+    		sum.res.add(res.get(i));
+    		i++;
+    	}
+    	while(j!=b.res.size()){
+    		sum.res.add(b.res.get(j));
+    		j++;
+    	}
+    	
+    	assert isValidPolynomial();
+    	assert sum.isValidPolynomial();
+    	assert b.isValidPolynomial();
+    	return sum;  
+    	
+    	}
+    	
+	
+    
+
+
+    /**
+       Returns the value of the poly at a given value of x.
+     */
+    public double eval(double x) {
+    double result=0;
+    for (int i=0;i<res.size();i++){
+    	result+=res.get(i).getCoeff()*Math.pow(x, res.get(i).getExpon());
+    }
+	return result;         // dummy code.  just to get stub to compile
+    }
+
+
+    /**
+       Return a String version of the polynomial with the 
+       following format, shown by example:
+       zero poly:   "0.0"
+       1-term poly: "3.2x^2"
+       4-term poly: "3.0x^5 + -x^2 + x + -7.9"
+
+       Polynomial is in a simplified form (only one term for any exponent),
+       with no zero-coefficient terms, and terms are shown in
+       decreasing order by exponent.
+    */
+    public String toFormattedString() {
+    	assert isValidPolynomial();
+    	if (res.size()==0){
+    		return "0.0";
+    	}
+    	else{ String returnString = "";
+    	for(int i=0;i<res.size()-1;i++){
+    		if (res.get(i).getCoeff()==1){
+    			returnString+="x^"+res.get(i).getExpon()+"+";
+    		}else{
+    			returnString+=res.get(i).getExpon()+"+";
+    		}
+    	}
+    	if (res.get(res.size()-1).getExpon()==0){
+    		returnString+=""+res.get(res.size()-1).getCoeff();
+    	}else if (res.get(res.size()-1).getExpon()==1){
+    		returnString+=""+res.get(res.size()-1).getCoeff()+"x";
+    	}else if (res.get(res.size()-1).getExpon()!=1){
+    		returnString+=""+res.get(res.size()-1).getCoeff()+"x^"+res.get(res.size()-1).getExpon();
+    	}else {
+    		returnString+="x^"+res.get(res.size()-1).getExpon();
+    	}
+    	return returnString;
+    	    	
+	    // dummy code.  just to get stub to compile
+    }
+    }
+
+
+    // **************************************************************
+    //  PRIVATE METHOD(S)
+
+    /**
+       Returns true iff the poly data is in a valid state.
+    */
+    private boolean isValidPolynomial() {
+    	if (res.size()<=1){
+    		return true;
+    	}else{
+    		for (int i=0;i<res.size();i++){
+    			if (res.get(i).getExpon()<0){
+    				return false;
+    			}
+    			if (res.get(i).getCoeff() == 0){
+    				return false;
+    			}
+    			if (i<res.size()-1){
+    				if (res.get(i).getExpon()==res.get(i+1).getExpon()){
+    					return false;
+    				}
+    			}
+    			if (i<res.size()-1){
+    				if (res.get(i).getExpon()<res.get(i+1).getExpon()){
+    					return false;
+    				}
+    			}
+    		}
+    		return true; 
+    	}
+    	
+    	
+	    // dummy code.  just to get stub to compile
+    }
+    
+  private void addTerm(Term term){
+	  if (term.getExpon()>=0 && term.getCoeff()!=0 ){
+		  res.add(term);
+	  }
+  }
+  
+    
+    
+
+}
