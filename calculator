@@ -1,0 +1,146 @@
+import java.util.*;
+public class PolynomialCalculator {
+	
+	private static final int NUM_POLYNOMIALS = 10;
+       public static void main(String[] args){
+    	   
+    	   Polynomial[] res=new Polynomial[NUM_POLYNOMIALS];//Create 10 polynomial objects
+    	   System.out.println("Enter 'help' for command options if u don't know.");
+   			System.out.print("cmd> ");
+   			Scanner in = new Scanner(System.in);
+   			String [] cmd = getcmd(in);
+   			while(!cmd[0].toLowerCase().equals("quit")){
+   				if (cmd.length==1){
+   					if (cmd[0].toLowerCase().equals("help")){
+   						help();
+   					}else {
+   						System.out.println("error!, type help to help");
+   					}
+   				}
+   				else if (cmd.length == 2 && errorIndexCheck(cmd)){
+   					int indexInt = Integer.parseInt(cmd[1]);
+   					if (cmd[0].equalsIgnoreCase("create")){
+   						create(indexInt, res);
+   					}
+   					else if ((cmd[0].toLowerCase()).equalsIgnoreCase("print")){
+   						System.out.println(res[indexInt].toFormattedString());
+   					}
+   					else if ((cmd[0].toLowerCase()).equalsIgnoreCase("eval")){
+   						eval(indexInt, res);
+   					}
+   					else{System.out.println("ERROR: Illegal");}
+   				}
+   				else if (cmd.length == 4){
+   					if ((cmd[0].toLowerCase()).equalsIgnoreCase("add") && errorIndexCheck(cmd)){   						
+   						int destIndex = Integer.parseInt(cmd[1]);
+   						int s1_Index = Integer.parseInt(cmd[2]);
+   						int s2_Index = Integer.parseInt(cmd[3]);
+   						add(destIndex, s1_Index, s2_Index, res); 						
+   					}
+   					else {System.out.println("ERROR: illegal index for a poly. must be between 0 and 9, inclusive");}   						
+   				} 				
+   				//if no keywords were entered, or length of input was beyond 4, then print error msg.
+   				else{System.out.println("ERROR: Illegal command. Type 'help' for command options.");} 			
+   				//if "quit" hasn't been entered yet, continue to ask the user for input via the getUserCmd() method.
+   				System.out.print("cmd> ");
+   				cmd = getcmd(in);
+   			}
+       }
+       
+       public static void help(){
+   		System.out.println("Command Options: ");
+   		System.out.println("1) Create a Polynomial: 'create (index)'.");
+   		System.out.println("2) Print a Polynomial: 'print (index)'.");
+   		System.out.println("3) Add two Polynomials: 'add (Destination index) (Source index1) (Source index2)'.");
+   		System.out.println("4) Evaluate a Polynomial: 'eval (index)'.");
+   		System.out.println("5) Quit program: 'quit'.");
+   	}
+       
+       public static Polynomial [] create(int index, Polynomial [] pArray){
+   		
+   		System.out.println("Enter a space-separated sequence of coeff-power pairs terminated by <nl>");
+   		Scanner input = new Scanner(System.in);
+   		String inLine = input.nextLine();
+   		ArrayList<Double> polyInfo = new ArrayList<Double>();
+   		Scanner lineScan = new Scanner(inLine);
+   		
+   		if (!lineScan.hasNextDouble()){
+   			System.out.println("ERROR: Illegal type entered in command! Only enter Double and Int! No change made!");
+   			return pArray;
+   		}
+   		else {
+   			
+   			while (lineScan.hasNextDouble()){
+   				polyInfo.add(lineScan.nextDouble());
+   			}
+
+   			if (polyInfo.size()%2 != 0){
+   				System.out.println("WARNING: Illegal number of coeff-power pairs entered! Last Coefficient deleted!");
+   				polyInfo.remove(polyInfo.size()-1);//ignore the last item
+   			}
+   			
+   			for (int i=0; i<polyInfo.size(); i+=2){
+   				if (polyInfo.get(i+1)<0){
+   					System.out.println("WARNING: Exponent entered is Negative, will treat as Positive!");
+   					polyInfo.set(i+1, Math.abs(polyInfo.get(i+1)));
+   				}
+   			}
+   			
+   			//By adding the Polynomial one at a time we guarantee that no matter what
+   			//order the coeff-power pairs were entered, they will be stored in a reversed order
+   			pArray[index] = new Polynomial();
+   			for (int i=0; i<polyInfo.size(); i+=2){
+   				double Coeff = polyInfo.get(i);
+   				double Expon = polyInfo.get(i+1);
+   				pArray[index] = pArray[index].add(new Polynomial(new Term(Coeff, (int)Expon)));
+   			}
+   			return pArray;
+   		}
+   		
+   	}
+       public static void eval(int index, Polynomial [] pArray){
+   		System.out.print("Enter a floating point value for x: ");
+   		Scanner input = new Scanner(System.in);
+   		
+   		//sanity check
+   		if (!input.hasNextDouble()){
+   			System.out.println("ERROR: Illegal type entered as value for x! No change made!");	
+   		}
+   		else{
+   			double value = input.nextDouble();
+   			System.out.println(pArray[index].eval(value));
+   		}
+   	}
+   	
+   	//handle add cmd
+   	public static void add(int dest, int source1, int source2, Polynomial [] pArray){
+   		pArray[dest] = pArray[source1].add(pArray[source2]);
+   	}
+   			
+   	public static boolean errorIndexCheck(String [] cmd){
+		for (int i=1; i<cmd.length; i++){
+			if (cmd[i].length()<=1){
+				int index = Integer.parseInt(cmd[i]);
+				if (index<0 || index>9){
+					return false;
+				}
+			}
+			else{
+				return false;
+			}
+		}
+		
+		return true;
+		
+	}		
+   			
+   			public static String [] getcmd(Scanner in){
+   				String cmdLine = in.nextLine();
+   				String [] cmd = cmdLine.split(" ");
+   				return cmd;
+   				
+   			}
+   			
+   	}
+   
+   	
